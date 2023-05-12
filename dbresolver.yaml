@@ -1,0 +1,9 @@
+apikey-1:
+  database: ristal.sqlite3
+  driver: sqlite
+apikey-2:
+  database: imara.sqlite3
+  driver: sqlite
+apikey-3:
+  database: dbname=educa user=educa password=STRONG_PASSWORD host=localhost sslmode=disable TimeZone=Africa/Juba
+  driver: postgres
