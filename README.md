@@ -8,7 +8,7 @@
 
 </div>
 
-dbresolver provides functionality for resolving and managing multiple database connections based on API keys from multiple clients.
+dbresolver provides functionality for resolving and managing multiple database connections based on API keys from different clients.
 
 If your have a small number of customers with a desire to use the same API but with different databases, this might be for you.
 
