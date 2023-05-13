@@ -19,8 +19,10 @@ var apiKeyHeader = "x-api-key"
 type ContextValue string
 
 // The context key used to access each database connection from req context.
-var connectionContextKey ContextValue = "connection"
-var databaseContextKey ContextValue = "database"
+var ConnectionContextKey ContextValue = "connection"
+
+// The context key used to access each database name from req context.
+var DatabaseContextKey ContextValue = "database"
 
 type Driver string
 
@@ -144,48 +146,47 @@ func (resolver *DBResolver) resolveDatabaseName(apiKey string) (string, error) {
 	return databaseName, nil
 }
 
-func (resolver *DBResolver) Middleware() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get database name from request API key.
-			apiKey := r.Header.Get(apiKeyHeader)
-			if apiKey == "" {
-				apiKey = r.URL.Query().Get(apiKeyHeader)
-			}
+func (resolver *DBResolver) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get database name from request API key.
+		apiKey := r.Header.Get(apiKeyHeader)
+		if apiKey == "" {
+			apiKey = r.URL.Query().Get(apiKeyHeader)
+		}
 
-			// Get underlying *gorm.DB for API key
-			db, err := resolver.resolveConnection(apiKey)
-			if err != nil {
-				log.Println(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		// Get underlying *gorm.DB for API key
+		db, err := resolver.resolveConnection(apiKey)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-			// Set the database connection in context
-			ctx := context.WithValue(r.Context(), connectionContextKey, db)
+		// Set the database connection in context
+		ctx := context.WithValue(r.Context(), ConnectionContextKey, db)
 
-			// Set the database name in context
-			// If we have a connection, there is no expected error
-			dbname, _ := resolver.resolveDatabaseName(apiKey)
-			ctx = context.WithValue(ctx, databaseContextKey, dbname)
+		// Set the database name in context
+		// If we have a connection, there is no expected error
+		dbname, _ := resolver.resolveDatabaseName(apiKey)
+		ctx = context.WithValue(ctx, DatabaseContextKey, dbname)
 
-			// Serve the request
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
+		// Serve the request
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+
 }
 
 // DB retrieves the current database connection from the request context.
 // This assumes that the handler was run after the middleware.
 // Otherwise, this will panic.
 func (resolver *DBResolver) DB(r *http.Request) *gorm.DB {
-	db := r.Context().Value(connectionContextKey).(*gorm.DB)
+	db := r.Context().Value(ConnectionContextKey).(*gorm.DB)
 	return db
 }
 
 // ResolveDatabase resolves the database name from the request APIKey.
 func (resolver *DBResolver) DBName(r *http.Request) string {
-	dbName := r.Context().Value(databaseContextKey).(string)
+	dbName := r.Context().Value(DatabaseContextKey).(string)
 	return dbName
 }
 

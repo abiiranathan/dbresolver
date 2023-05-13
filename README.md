@@ -107,3 +107,15 @@ fetch("http://localhost:8080", {
   },
 });
 ```
+
+### Usage with [GIN Router](https://github.com/gin-gonic/gin)
+
+Use the `gin-adaptor` package to wrap http.Handler middleware to a gin middleware at [Github](https://github.com/gwatts/gin-adapter).
+
+See [GIN Example](https://github.com/abiiranathan/dbresolver-examples/gin/main.go)
+
+### Usage with [Fiber Router](https://github.com/gofiber/fiber)
+
+Use the `adaptor` package to wrap http.Handler middleware to a fiber middleware at [Github](https://github.com/gofiber/adaptor).
+
+See [Fiber/v2 Example](https://github.com/abiiranathan/dbresolver-examples/fiber/main.go)
