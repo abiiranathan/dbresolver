@@ -76,7 +76,7 @@ func main() {
 	})
 
 	// Hook your main handler with our resolver middleware.
-	mux := resolver.Middleware()(http.DefaultServeMux)
+	mux := resolver.Middleware(http.DefaultServeMux)
 	log.Fatalln(http.ListenAndServe(":8080", mux))
 }
 ```
